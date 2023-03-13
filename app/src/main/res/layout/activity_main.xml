@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable name="calc" type="mmcs.assignment3_calculator.viewmodel.Calculator"/>
+        <import type="mmcs.assignment3_calculator.viewmodel.Operation"/>
+    </data>
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/almostBlack"
+    tools:ignore="HardcodedText"
+    tools:context=".view.MainActivity">
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2"
+        android:padding="20dp">
+
+        <TextView
+            android:id="@+id/workingsTV"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@{calc.display}"
+            android:lines="2"
+            android:maxLines="2"
+            android:textColor="@color/white"
+            android:textAlignment="textEnd"
+            android:textSize="25sp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <LinearLayout
+        style="@style/buttonRow">
+
+        <Button
+            style="@style/buttonNumber"
+            android:textColor="@color/red"
+            android:onClick="@{() -> calc.reset()}"
+            android:text="AC"/>
+        <Button
+            style="@style/buttonNumber"
+            android:textColor="@color/red"
+            android:onClick="@{() -> calc.clear()}"
+            android:text="⌫"/>
+        <Button
+            style="@style/buttonNumber"
+            android:text="" />
+        <Button
+            style="@style/buttonOperator"
+            android:onClick="@{() -> calc.addOperation(Operation.DIV)}"
+            android:text="/"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        style="@style/buttonRow">
+
+        <Button
+            style="@style/buttonNumber"
+            android:onClick="@{() -> calc.addDigit(7)}"
+            android:text="7"/>
+
+        <Button
+            style="@style/buttonNumber"
+            android:onClick="@{() -> calc.addDigit(8)}"
+            android:text="8"/>
+        <Button
+            style="@style/buttonNumber"
+            android:onClick="@{() -> calc.addDigit(9)}"
+            android:text="9" />
+        <Button
+            style="@style/buttonOperator"
+            android:onClick="@{() -> calc.addOperation(Operation.MUL)}"
+            android:text="x"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        style="@style/buttonRow">
+
+        <Button
+            style="@style/buttonNumber"
+            android:onClick="@{() -> calc.addDigit(4)}"
+            android:text="4"/>
+
+        <Button
+            style="@style/buttonNumber"
+            android:onClick="@{() -> calc.addDigit(5)}"
+            android:text="5" />
+
+        <Button
+            style="@style/buttonNumber"
+            android:onClick="@{() -> calc.addDigit(6)}"
+            android:text="6" />
+        <Button
+            style="@style/buttonOperator"
+            android:onClick="@{() -> calc.addOperation(Operation.SUB)}"
+            android:text="-"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        style="@style/buttonRow">
+
+        <Button
+            style="@style/buttonNumber"
+            android:onClick="@{() -> calc.addDigit(1)}"
+            android:text="1"/>
+        <Button
+            style="@style/buttonNumber"
+            android:onClick="@{() -> calc.addDigit(2)}"
+            android:text="2"/>
+        <Button
+            style="@style/buttonNumber"
+            android:onClick="@{() -> calc.addDigit(3)}"
+            android:text="3" />
+        <Button
+            style="@style/buttonOperator"
+            android:onClick="@{() -> calc.addOperation(Operation.ADD)}"
+            android:text="+"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        style="@style/buttonRow">
+
+        <Button
+            style="@style/buttonNumber"
+            android:onClick="@{() -> calc.addPoint()}"
+            android:text="."/>
+        <Button
+            style="@style/buttonNumber"
+            android:onClick="@{() -> calc.addDigit(0)}"
+            android:text="0"/>
+        <Button
+            style="@style/buttonNumber"
+            android:layout_weight="2"
+            android:background="@color/orange"
+            android:textSize="40sp"
+            android:onClick="@{() -> calc.compute()}"
+            android:text="=" />
+
+    </LinearLayout>
+
+
+
+</LinearLayout>
+</layout>
