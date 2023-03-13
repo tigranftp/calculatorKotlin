@@ -3,13 +3,25 @@ package mmcs.assignment3_calculator.viewmodel
 import androidx.databinding.BaseObservable
 import androidx.databinding.ObservableField
 
-class CalculatorViewModel : BaseObservable(), Calculator {
+class CalculatorViewModel: BaseObservable(), Calculator {
     override var display = ObservableField<String>()
 
     private var numberHavePoint = false
 
-    override fun addDigit(dig: Int) {
-        if (display.get() != null) {
+    override fun addDigit(dig: Int)
+    {
+        if ("${display.get()}".isEmpty()) {
+            display.set(dig.toString())
+            return
+        }
+        if ("${display.get()}".last() == '!')
+        {
+            display.set(dig.toString())
+            return
+        }
+
+        if (display.get() != null)
+        {
             val number = display.get() + dig
             display.set(number)
             return
@@ -19,17 +31,43 @@ class CalculatorViewModel : BaseObservable(), Calculator {
     }
 
     override fun addPoint() {
-        if (display.get() == "" || display.get() == null || numberHavePoint) {
+        if (display.get() == "" || display.get() == null || numberHavePoint)
+        {
             return
         }
+
+        if ("${display.get()}".last() == '!')
+        {
+            display.set("")
+            return
+        }
+
         numberHavePoint = true
         display.set("${display.get()}.")
     }
 
     override fun addOperation(op: Operation) {
+        if ("${display.get()}".isEmpty()) {
+            if (op == Operation.SUB)
+            {
+                display.set("-")
+            }
+            return
+        }
+        if ("${display.get()}".last() == '!')
+        {
+            display.set("")
+            if (op == Operation.SUB)
+            {
+                display.set("-")
+            }
+            return
+        }
 
-        if (display.get() == "" || display.get() == null || numberHavePoint) {
-            if (op == Operation.SUB) {
+        if (display.get() == "" || display.get() == null)
+        {
+            if (op == Operation.SUB)
+            {
                 display.set("-")
             }
             return
@@ -39,11 +77,11 @@ class CalculatorViewModel : BaseObservable(), Calculator {
 
         var lastCharacter = "${display.get()}".last()
 
-        when (lastCharacter) {
-            '+', '×', '÷','-'  -> display.set("${display.get()}".dropLast(1))
+        when (lastCharacter){
+            '+', '×', '÷', '-' -> display.set("${display.get()}".dropLast(1))
         }
 
-        when (op) {
+        when (op){
             Operation.ADD -> operation = "+"
             Operation.SUB -> operation = "-"
             Operation.MUL -> operation = "×"
@@ -62,22 +100,48 @@ class CalculatorViewModel : BaseObservable(), Calculator {
             return
         }
 
-        if ("${display.get()}".last() == '!') {
+        if ("${display.get()}".last() == '!')
+        {
+            display.set("")
+            return
+        }
+
+        val lastCharacter= "${display.get()}".last()
+
+        when (lastCharacter){
+            '+', '×', '÷', '-' -> display.set("${display.get()}".dropLast(1))
+        }
+
+        if ("${display.get()}".isEmpty()) {
             display.set("")
             return
         }
 
         numberHavePoint = false
 
-        var result = evaluate("${display.get()}")
+//        var result = evaluate("${display.get()}")
+//
+//        if ((result.toInt() - result) != 0.0)
+//        {
+//            display.set(((result * 100000).toInt() / 100000.0).toString())
+//            return
+//        }
+//
+//        display.set(result.toInt().toString())
 
-        if ((result.toInt() - result) != 0.0) {
-            display.set(((result * 100000).toInt() / 100000.0).toString())
-            return
+        try {
+            var result = evaluate("${display.get()}")
+
+            if ((result.toInt() - result) != 0.0)
+            {
+                display.set(((result * 100000).toInt() / 100000.0).toString())
+                return
+            }
+
+            display.set(result.toInt().toString())
+        } catch (e: Exception) {
+            display.set("Division by zero!")
         }
-
-        display.set(result.toInt().toString())
-
     }
 
     fun evaluate(str: String): Double {
@@ -95,11 +159,9 @@ class CalculatorViewModel : BaseObservable(), Calculator {
                 var (rest, carry) = getTerm(chars)
                 while (true) {
                     when {
-                        rest.firstOrNull() == '+' -> rest =
-                            getTerm(rest.drop(1)).also { carry += it.value }.rest
-                        rest.firstOrNull() == '-' -> rest =
-                            getTerm(rest.drop(1)).also { carry -= it.value }.rest
-                        else -> return Data(rest, carry)
+                        rest.firstOrNull() == '+' -> rest = getTerm(rest.drop(1)).also { carry += it.value }.rest
+                        rest.firstOrNull() == '-' -> rest = getTerm(rest.drop(1)).also { carry -= it.value }.rest
+                        else                      -> return Data(rest, carry)
                     }
                 }
             }
@@ -108,29 +170,29 @@ class CalculatorViewModel : BaseObservable(), Calculator {
                 var (rest, carry) = getFactor(chars)
                 while (true) {
                     when {
-                        rest.firstOrNull() == '×' -> rest =
-                            getTerm(rest.drop(1)).also { carry *= it.value }.rest
-                        rest.firstOrNull() == '÷' -> {
+                        rest.firstOrNull() == '×' -> rest = getTerm(rest.drop(1)).also { carry *= it.value }.rest
+                        rest.firstOrNull() == '÷' ->
+                        {
                             rest = getTerm(rest.drop(1)).also {
-//                                if (it.value == 0.0)
-//                                {
-//                                    throw Exception("Division by zero!")
-//                                }
+                                if (it.value == 0.0)
+                                {
+                                    throw Exception("Division by zero!")
+                                }
                                 carry /= it.value
                             }.rest
                         }
-                        else -> return Data(rest, carry)
+                        else                      -> return Data(rest, carry)
                     }
                 }
             }
 
             fun getFactor(chars: List<Char>): Data {
                 return when (val char = chars.firstOrNull()) {
-                    '+' -> getFactor(chars.drop(1)).let { Data(it.rest, +it.value) }
-                    '-' -> getFactor(chars.drop(1)).let { Data(it.rest, -it.value) }
-                    '(' -> getParenthesizedExpression(chars.drop(1))
+                    '+'              -> getFactor(chars.drop(1)).let { Data(it.rest, +it.value) }
+                    '-'              -> getFactor(chars.drop(1)).let { Data(it.rest, -it.value) }
+                    '('              -> getParenthesizedExpression(chars.drop(1))
                     in '0'..'9', ',' -> getNumber(chars)
-                    else -> throw RuntimeException("Unexpected character: $char")
+                    else             -> throw RuntimeException("Unexpected character: $char")
                 }
             }
 
@@ -154,14 +216,20 @@ class CalculatorViewModel : BaseObservable(), Calculator {
             return
         }
 
+        if ("${display.get()}".last() == '!')
+        {
+            display.set("")
+            return
+        }
 
-        if ("${display.get()}".last() == '.') {
+        if ("${display.get()}".last() == '.'){
             numberHavePoint = false
         }
         println("${display.get()}".dropLast(1))
 
         var text = "${display.get()}".dropLast(1)
-        when (text) {
+        when (text)
+        {
             "+", "-", "÷", "×" -> {
                 display.set("")
                 return
